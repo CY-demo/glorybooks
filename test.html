@@ -435,7 +435,6 @@
     </div>
 
     <script>
-    // ... Editor Scripts ...
     window.books = []; window.authors = {}; window.merch = []; window.activity = []; window.contact = {}; window.siteSettings = {}; window.homeContent = "";
     let isLoggedIn = false;
     const authorTags = ["全部作品", "莫斯卡托", "本生燈"];
@@ -708,11 +707,17 @@
             const data = window.authors[id];
             if (!data) return;
             const container = document.getElementById('ad-content');
+            
+            // 排序邏輯：年份由新到舊
             const myBooks = window.books.filter(b => b.author.includes(data.name)).sort((a,b) => (b.publish_year - a.publish_year) || (b.id - a.id));
+            
             const ongoing = myBooks.filter(b => b.status === 'ongoing');
             const completed = myBooks.filter(b => b.status === 'completed');
             const published = myBooks.filter(b => b.status === 'published');
-            const makeTextList = (arr) => arr.map(b => `<div class="text-work-item"><a class="t-work-title">《${b.title}》</a><div class="t-work-meta">${b.tags.split(',').join('、')}</div><div class="t-work-meta">${b.cp ? b.cp : ''}</div><div class="t-work-meta">字數：${b.word_count||'-'}</div>${b.description ? `<div class="t-work-note">${b.description.replace(/\n/g, '<br>')}</div>` : ''}</div>`).join('');
+            
+            // ★★★ 文案修復：直接渲染 HTML 內容 (b.description)，不使用 .replace() ★★★
+            const makeTextList = (arr) => arr.map(b => `<div class="text-work-item"><a class="t-work-title">《${b.title}》</a><div class="t-work-meta">${b.tags.split(',').join('、')}</div><div class="t-work-meta">${b.cp ? b.cp : ''}</div><div class="t-work-meta">字數：${b.word_count||'-'}</div>${b.description ? `<div class="t-work-note rich-text-content">${b.description}</div>` : ''}</div>`).join('');
+            
             const makePubList = (arr) => arr.map(b => `<div class="pub-work-item"><img src="${b.cover}" class="pub-cover"><div class="pub-title">《${b.title.replace(/\n/g, '<br>')}》</div><div class="pub-meta">${b.tags}</div></div>`).join('');
             let topSection = `<div class="author-detail-header"><img src="${data.avatar}" class="ad-avatar"><div class="ad-info"><div class="ad-name">${data.name}</div><div class="ad-bio rich-text-content">${data.bio || ''}</div></div></div>`;
             
